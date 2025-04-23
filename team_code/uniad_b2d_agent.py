@@ -18,7 +18,8 @@ from Bench2DriveZoo.team_code.planner import RoutePlanner
 from leaderboard.autoagents import autonomous_agent
 from mmcv import Config
 from mmcv.models import build_model
-from mmcv.utils import (get_dist_info, init_dist, load_checkpoint,wrap_fp16_model)
+from mmcv.utils import (get_dist_info, init_dist, load_checkpoint,
+                        wrap_fp16_model)
 from mmcv.datasets.pipelines import Compose
 from mmcv.parallel.collate import collate as  mm_collate_to_batch_form
 from mmcv.core.bbox import get_box_type
@@ -102,18 +103,18 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
         # write extrinsics directly
         self.lidar2img = {
         'CAM_FRONT':np.array([[ 1.14251841e+03,  8.00000000e+02,  0.00000000e+00, -9.52000000e+02],
-                                  [ 0.00000000e+00,  4.50000000e+02, -1.14251841e+03, -8.09704417e+02],
-                                  [ 0.00000000e+00,  1.00000000e+00,  0.00000000e+00, -1.19000000e+00],
-                                 [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]]),
-          'CAM_FRONT_LEFT':np.array([[ 6.03961325e-14,  1.39475744e+03,  0.00000000e+00, -9.20539908e+02],
+                              [ 0.00000000e+00,  4.50000000e+02, -1.14251841e+03, -8.09704417e+02],
+                              [ 0.00000000e+00,  1.00000000e+00,  0.00000000e+00, -1.19000000e+00],
+                              [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]]),
+        'CAM_FRONT_LEFT':np.array([[ 6.03961325e-14,  1.39475744e+03,  0.00000000e+00, -9.20539908e+02],
                                    [-3.68618420e+02,  2.58109396e+02, -1.14251841e+03, -6.47296750e+02],
                                    [-8.19152044e-01,  5.73576436e-01,  0.00000000e+00, -8.29094072e-01],
                                    [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]]),
-          'CAM_FRONT_RIGHT':np.array([[ 1.31064327e+03, -4.77035138e+02,  0.00000000e+00,-4.06010608e+02],
-                                       [ 3.68618420e+02,  2.58109396e+02, -1.14251841e+03,-6.47296750e+02],
+        'CAM_FRONT_RIGHT':np.array([[ 1.31064327e+03, -4.77035138e+02,  0.00000000e+00,-4.06010608e+02],
+                                    [ 3.68618420e+02,  2.58109396e+02, -1.14251841e+03,-6.47296750e+02],
                                     [ 8.19152044e-01,  5.73576436e-01,  0.00000000e+00,-8.29094072e-01],
                                     [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, 1.00000000e+00]]),
-         'CAM_BACK':np.array([[-5.60166031e+02, -8.00000000e+02,  0.00000000e+00, -1.28800000e+03],
+        'CAM_BACK':np.array([[-5.60166031e+02, -8.00000000e+02,  0.00000000e+00, -1.28800000e+03],
                      [ 5.51091060e-14, -4.50000000e+02, -5.60166031e+02, -8.58939847e+02],
                      [ 1.22464680e-16, -1.00000000e+00,  0.00000000e+00, -1.61000000e+00],
                      [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00]]),
@@ -129,14 +130,14 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
         }
         self.lidar2cam = {
         'CAM_FRONT':np.array([[ 1.  ,  0.  ,  0.  ,  0.  ],
-                                 [ 0.  ,  0.  , -1.  , -0.24],
-                                 [ 0.  ,  1.  ,  0.  , -1.19],
+                              [ 0.  ,  0.  , -1.  , -0.24],
+                              [ 0.  ,  1.  ,  0.  , -1.19],
                               [ 0.  ,  0.  ,  0.  ,  1.  ]]),
         'CAM_FRONT_LEFT':np.array([[ 0.57357644,  0.81915204,  0.  , -0.22517331],
-                                      [ 0.        ,  0.        , -1.  , -0.24      ],
+                                   [ 0.        ,  0.        , -1.  , -0.24      ],
                                    [-0.81915204,  0.57357644,  0.  , -0.82909407],
                                    [ 0.        ,  0.        ,  0.  ,  1.        ]]),
-          'CAM_FRONT_RIGHT':np.array([[ 0.57357644, -0.81915204, 0.  ,  0.22517331],
+        'CAM_FRONT_RIGHT':np.array([[ 0.57357644, -0.81915204, 0.  ,  0.22517331],
                                    [ 0.        ,  0.        , -1.  , -0.24      ],
                                    [ 0.81915204,  0.57357644,  0.  , -0.82909407],
                                    [ 0.        ,  0.        ,  0.  ,  1.        ]]),
@@ -167,7 +168,6 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
         self.coor2topdown = topdown_intrinsics @ self.coor2topdown
 
     def _init(self):
-        
         try:
             locx, locy = self._global_plan_world_coord[0][0].location.x, self._global_plan_world_coord[0][0].location.y
             lon, lat = self._global_plan[0][0]['lon'], self._global_plan[0][0]['lat']
@@ -182,7 +182,7 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
             self.lat_ref, self.lon_ref = solution[0], solution[1]
         except Exception as e:
             print(e, flush=True)
-            self.lat_ref, self.lon_ref = 0, 0        
+            self.lat_ref, self.lon_ref = 0, 0      
         self._route_planner = RoutePlanner(4.0, 50.0, lat_ref=self.lat_ref, lon_ref=self.lon_ref)
         self._route_planner.set_route(self._global_plan, True)
         self.initialized = True
@@ -255,9 +255,8 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
                     'reading_frequency': 20,
                     'id': 'SPEED'
                 },
-                
             ]
-        
+
         if IS_BENCH2DRIVE:
             sensors += [
                     {	
@@ -284,8 +283,10 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
         compass = input_data['IMU'][1][-1]
         acceleration = input_data['IMU'][1][:3]
         angular_velocity = input_data['IMU'][1][3:6]
+
         pos = self.gps_to_location(gps)
         near_node, near_command = self._route_planner.run_step(pos)
+
         if (math.isnan(compass) == True): #It can happen that the compass sends nan for a few frames
             compass = 0.0
             acceleration = np.zeros(3)
@@ -302,7 +303,6 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
                 'angular_velocity':angular_velocity,
                 'command_near':near_command,
                 'command_near_xy':near_node
-    
                 }
         
         return result
@@ -328,11 +328,11 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
             results['img'].append(tick_data['imgs'][cam])
         results['lidar2img'] = np.stack(results['lidar2img'],axis=0)
         results['lidar2cam'] = np.stack(results['lidar2cam'],axis=0)
-  
+
         raw_theta = tick_data['compass']   if not np.isnan(tick_data['compass']) else 0
         ego_theta = -raw_theta + np.pi/2
         rotation = list(Quaternion(axis=[0, 0, 1], radians=ego_theta))
-  
+
         can_bus = np.zeros(18)
         can_bus[0] = tick_data['pos'][0]
         can_bus[1] = -tick_data['pos'][1]
@@ -349,7 +349,7 @@ class UniadAgent(autonomous_agent.AutonomousAgent):
             command = 4
         command -= 1
         results['command'] = command
-  
+
         theta_to_lidar = raw_theta
         command_near_xy = np.array([tick_data['command_near_xy'][0]-can_bus[0],-tick_data['command_near_xy'][1]-can_bus[1]])
         rotation_matrix = np.array([[np.cos(theta_to_lidar),-np.sin(theta_to_lidar)],[np.sin(theta_to_lidar),np.cos(theta_to_lidar)]])

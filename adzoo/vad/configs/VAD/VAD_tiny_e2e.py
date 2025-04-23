@@ -46,7 +46,7 @@ model = dict(
     type='VAD',
     use_grid_mask=True,
     video_test_mode=True,
-    pretrained=dict(img='torchvision://resnet50'),
+    pretrained=dict(img='torchvision://resnet50'), # pretrained weights for img backbone (ResNet)
     img_backbone=dict(
         type='ResNet',
         depth=50,

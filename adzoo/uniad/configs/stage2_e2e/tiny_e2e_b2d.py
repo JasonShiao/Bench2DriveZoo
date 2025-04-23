@@ -11,6 +11,7 @@ voxel_size = [0.2, 0.2, 8]
 patch_size = [102.4, 102.4]
 img_norm_cfg = dict(mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
 
+# From carla specific blueprint name to class name
 NameMapping = {
     #=================vehicle=================
     # bicycle
@@ -180,11 +181,12 @@ model = dict(
         type='ResNet',
         depth=50,
         num_stages=4,
-        out_indices=(1,2,3),
+        out_indices=(1, 2, 3),
         frozen_stages=4,
         norm_cfg=dict(type='BN', requires_grad=False),
         norm_eval=True,
-        style='pytorch'),
+        style='pytorch'
+    ),
     img_neck=dict(
         type="FPN",
         in_channels=[512, 1024, 2048],
@@ -574,6 +576,7 @@ ann_file_train=info_root + f"/b2d_infos_train.pkl"
 ann_file_val=info_root + f"/b2d_infos_val.pkl"
 ann_file_test=info_root + f"/b2d_infos_val.pkl"
 
+
 train_pipeline = [
     dict(type="LoadMultiViewImageFromFilesInCeph", to_float32=True, file_client_args=file_client_args, img_root=data_root),
     dict(type="PhotoMetricDistortionMultiViewImage"),
@@ -728,7 +731,6 @@ inference_only_pipeline = [
         ],
     ),
 ]
-
 
 data = dict(
     samples_per_gpu=1,

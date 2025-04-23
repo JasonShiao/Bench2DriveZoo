@@ -11,6 +11,7 @@ voxel_size = [0.2, 0.2, 8]
 patch_size = [102.4, 102.4]
 img_norm_cfg = dict(mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
 
+# From carla specific blueprint name to class name
 NameMapping = {
     #=================vehicle=================
     # bicycle
@@ -805,7 +806,7 @@ optimizer = dict(
     lr=2e-4,
     paramwise_cfg=dict(
         custom_keys={
-            "img_backbone": dict(lr_mult=0.1),
+            "img_backbone": dict(lr_mult=0.1), # effective lr = base_lr * lr_mult
         }
     ),
     weight_decay=0.01,

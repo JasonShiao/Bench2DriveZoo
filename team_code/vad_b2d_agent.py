@@ -190,8 +190,6 @@ class VadAgent(autonomous_agent.AutonomousAgent):
         self._route_planner.set_route(self._global_plan, True)
         self.initialized = True
         self.metric_info = {}
-  
-  
 
     def sensors(self):
         sensors =[
@@ -261,6 +259,7 @@ class VadAgent(autonomous_agent.AutonomousAgent):
                     'id': 'SPEED'
                 },
             ]
+
         if IS_BENCH2DRIVE:
             sensors += [
                     {	
@@ -287,10 +286,10 @@ class VadAgent(autonomous_agent.AutonomousAgent):
         compass = input_data['IMU'][1][-1]
         acceleration = input_data['IMU'][1][:3]
         angular_velocity = input_data['IMU'][1][3:6]
-  
+
         pos = self.gps_to_location(gps)
         near_node, near_command = self._route_planner.run_step(pos)
-  
+
         if (math.isnan(compass) == True): #It can happen that the compass sends nan for a few frames
             compass = 0.0
             acceleration = np.zeros(3)
@@ -332,9 +331,11 @@ class VadAgent(autonomous_agent.AutonomousAgent):
             results['img'].append(tick_data['imgs'][cam])
         results['lidar2img'] = np.stack(results['lidar2img'],axis=0)
         results['lidar2cam'] = np.stack(results['lidar2cam'],axis=0)
+
         raw_theta = tick_data['compass']   if not np.isnan(tick_data['compass']) else 0
         ego_theta = -raw_theta + np.pi/2
         rotation = list(Quaternion(axis=[0, 0, 1], radians=ego_theta))
+
         can_bus = np.zeros(18)
         can_bus[0] = tick_data['pos'][0]
         can_bus[1] = -tick_data['pos'][1]
@@ -367,6 +368,7 @@ class VadAgent(autonomous_agent.AutonomousAgent):
         command_onehot = np.zeros(6)
         command_onehot[command] = 1
         results['ego_fut_cmd'] = command_onehot
+
         theta_to_lidar = raw_theta
         command_near_xy = np.array([tick_data['command_near_xy'][0]-can_bus[0],-tick_data['command_near_xy'][1]-can_bus[1]])
         rotation_matrix = np.array([[np.cos(theta_to_lidar),-np.sin(theta_to_lidar)],[np.sin(theta_to_lidar),np.cos(theta_to_lidar)]])
@@ -402,7 +404,7 @@ class VadAgent(autonomous_agent.AutonomousAgent):
         self.pid_metadata['agent'] = 'only_traj'
         control.steer = np.clip(float(steer_traj), -1, 1)
         control.throttle = np.clip(float(throttle_traj), 0, 0.75)
-        control.brake = np.clip(float(brake_traj), 0, 1)     
+        control.brake = np.clip(float(brake_traj), 0, 1)
         self.pid_metadata['steer'] = control.steer
         self.pid_metadata['throttle'] = control.throttle
         self.pid_metadata['brake'] = control.brake
