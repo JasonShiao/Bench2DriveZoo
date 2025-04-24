@@ -20,7 +20,7 @@ from mmcv.parallel import DataContainer as DC
 import random
 from mmcv.core.bbox.structures.box_3d_mode import LiDARInstance3DBoxes
 from nuscenes.utils.data_classes import Box as NuScenesBox
-from adzoo.law.mmdet3d_plugin.core.bbox.structures.nuscenes_box import CustomNuscenesBox
+from mmcv.core.bbox.structures.nuscenes_box import CustomNuscenesBox
 from shapely import affinity, ops
 from shapely.geometry import LineString, box, MultiPolygon, MultiLineString
 from mmcv.datasets.pipelines import to_tensor

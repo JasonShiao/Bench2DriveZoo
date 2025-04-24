@@ -16,7 +16,7 @@ from mmcv.models.utils.transformer import inverse_sigmoid
 from mmcv.models import HEADS
 from mmcv.models.dense_heads import DETRHead
 from mmcv.core.bbox.coder import build_bbox_coder
-from adzoo.law.mmdet3d_plugin.core.bbox.util import normalize_bbox
+from mmcv.core.bbox.util import normalize_bbox
 from mmcv.models.bricks.transformer import build_positional_encoding
 from mmcv.utils import force_fp32, auto_fp16
 from adzoo.law.mmdet3d_plugin.models.utils.bricks import run_time
