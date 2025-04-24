@@ -6,13 +6,13 @@ from mmcv.models.bricks.transformer import build_transformer_layer_sequence
 
 from mmcv.models.utils.builder import TRANSFORMER
 from torch.nn.init import normal_
-from projects.mmdet3d_plugin.models.utils.visual import save_tensor
+from adzoo.law.mmdet3d_plugin.models.utils.visual import save_tensor
 from mmcv.models.backbones.base_module import BaseModule
 from torchvision.transforms.functional import rotate
 from .temporal_self_attention import TemporalSelfAttention
 from .spatial_cross_attention import MSDeformableAttention3D
 from .decoder import CustomMSDeformableAttention
-from projects.mmdet3d_plugin.models.utils.bricks import run_time
+from adzoo.law.mmdet3d_plugin.models.utils.bricks import run_time
 from mmcv.utils import force_fp32, auto_fp16
 
 

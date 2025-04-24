@@ -26,9 +26,9 @@ from mmcv.datasets import (build_dataset,
 from mmcv.utils import get_root_logger
 import time
 import os.path as osp
-from projects.mmdet3d_plugin.datasets.builder import build_dataloader
-from projects.mmdet3d_plugin.core.evaluation.eval_hooks import CustomDistEvalHook
-from projects.mmdet3d_plugin.datasets import custom_build_dataset
+from adzoo.law.mmdet3d_plugin.datasets.builder import build_dataloader
+from adzoo.law.mmdet3d_plugin.core.evaluation.eval_hooks import CustomDistEvalHook
+from adzoo.law.mmdet3d_plugin.datasets import custom_build_dataset
 def custom_train_detector(model,
                    dataset,
                    cfg,

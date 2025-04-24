@@ -5,7 +5,7 @@ from mmcv.core.bbox.assigners.assign_result import AssignResult
 from mmcv.core.bbox.assigners import BaseAssigner
 from mmcv.core.bbox.match_costs import build_match_cost
 from mmcv.models.utils.transformer import inverse_sigmoid
-from projects.mmdet3d_plugin.core.bbox.util import normalize_bbox
+from adzoo.law.mmdet3d_plugin.core.bbox.util import normalize_bbox
 
 try:
     from scipy.optimize import linear_sum_assignment

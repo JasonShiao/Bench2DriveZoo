@@ -2,7 +2,7 @@ import torch
 
 from mmcv.core.bbox.coder.base_bbox_coder import BaseBBoxCoder
 from mmcv.core.bbox.builder import BBOX_CODERS
-from projects.mmdet3d_plugin.VAD.utils.map_utils import (
+from adzoo.law.mmdet3d_plugin.VAD.utils.map_utils import (
     denormalize_2d_pts, denormalize_2d_bbox
 )
 

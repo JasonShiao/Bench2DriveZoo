@@ -13,7 +13,7 @@ from mmcv.core import build_bbox_coder, build_assigner, multi_apply, reduce_mean
 from mmcv.models import HEADS
 from mmcv.models.utils.transformer import inverse_sigmoid
 
-from projects.mmdet3d_plugin.LAW.utils import prj_pts_to_img
+from adzoo.law.mmdet3d_plugin.LAW.utils import prj_pts_to_img
 
 from torch.nn.parameter import Parameter
 from torch.nn import Linear
@@ -24,8 +24,8 @@ import os
 from PIL import Image
 import time, json
 
-from projects.mmdet3d_plugin.LAW.dense_heads.utils import get_locations
-from projects.mmdet3d_plugin.LAW.utils.visualization import prj_ego_traj_to_2d
+from adzoo.law.mmdet3d_plugin.LAW.dense_heads.utils import get_locations
+from adzoo.law.mmdet3d_plugin.LAW.utils.visualization import prj_ego_traj_to_2d
 # from thop import profile
 
 @HEADS.register_module()

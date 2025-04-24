@@ -21,11 +21,11 @@ from mmcv.utils import (get_dist_info, init_dist, load_checkpoint,
 
 from mmdet3d.apis import single_gpu_test
 from mmcv.datasets import build_dataset
-from projects.mmdet3d_plugin.datasets.builder import build_dataloader
+from mmcv.datasets.builder import build_dataloader
 from mmcv.models import build_model
 from mmcv.utils import set_random_seed
 # from projects.mmdet3d_plugin.bevformer.apis.test import custom_multi_gpu_test
-from projects.mmdet3d_plugin.VAD.apis.test import custom_multi_gpu_test
+from adzoo.law.mmdet3d_plugin.VAD.apis.test import custom_multi_gpu_test
 from mmcv.datasets import replace_ImageToTensor
 import time
 import os.path as osp

@@ -9,12 +9,12 @@ from mmcv.utils import force_fp32, auto_fp16
 from scipy.optimize import linear_sum_assignment
 from mmcv.models.detectors.mvx_two_stage import MVXTwoStageDetector
 
-from projects.mmdet3d_plugin import VAD
-from projects.mmdet3d_plugin.models.utils.grid_mask import GridMask
-from projects.mmdet3d_plugin.VAD.planner.metric_stp3 import PlanningMetric
+from adzoo.law.mmdet3d_plugin import VAD
+from adzoo.law.mmdet3d_plugin.models.utils.grid_mask import GridMask
+from adzoo.law.mmdet3d_plugin.VAD.planner.metric_stp3 import PlanningMetric
 from mmcv.models import builder
 
-from projects.mmdet3d_plugin.LAW.utils import prj_pts_to_img, draw_lidar_pts, denormalize_img
+from adzoo.law.mmdet3d_plugin.LAW.utils import prj_pts_to_img, draw_lidar_pts, denormalize_img
 import matplotlib.pyplot as plt
 from ipdb import set_trace
 

@@ -5,11 +5,12 @@ import warnings
 from mmcv import Config, DictAction, mkdir_or_exist, track_iter_progress
 from os import path as osp
 
-from mmdet3d.core.bbox import (Box3DMode, CameraInstance3DBoxes, Coord3DMode,
+from mmcv.core.bbox.structures.box_3d_mode import (Box3DMode, CameraInstance3DBoxes,
                                DepthInstance3DBoxes, LiDARInstance3DBoxes)
-from mmdet3d.core.visualizer import (show_multi_modality_result, show_result,
+from mmcv.core.bbox.structures.coord_3d_mode import Coord3DMode
+from mmcv.core.visualizer import (show_multi_modality_result, show_result,
                                      show_seg_result)
-from mmdet3d.datasets import build_dataset
+from mmcv.datasets import build_dataset
 
 
 def parse_args():

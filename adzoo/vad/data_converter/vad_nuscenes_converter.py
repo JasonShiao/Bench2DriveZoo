@@ -12,9 +12,9 @@ from pyquaternion import Quaternion
 from nuscenes.nuscenes import NuScenes
 from nuscenes.utils.data_classes import Box
 from shapely.geometry import MultiPoint, box
-from mmdet3d.datasets import NuScenesDataset
+from mmcv.datasets import NuScenesDataset
 from nuscenes.utils.geometry_utils import view_points
-from mmdet3d.core.bbox.box_np_ops import points_cam2img
+from mmcv.core.bbox.box_np_ops import points_cam2img
 from nuscenes.utils.geometry_utils import transform_matrix
 
 

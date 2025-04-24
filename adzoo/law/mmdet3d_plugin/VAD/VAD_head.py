@@ -18,9 +18,9 @@ from mmcv.models import Linear, bias_init_with_prob, xavier_init
 from mmcv.core import (multi_apply, multi_apply, reduce_mean)
 from mmcv.models.bricks.transformer import build_transformer_layer_sequence
 
-from projects.mmdet3d_plugin.core.bbox.util import normalize_bbox
-from projects.mmdet3d_plugin.VAD.utils.traj_lr_warmup import get_traj_warmup_loss_weight
-from projects.mmdet3d_plugin.VAD.utils.map_utils import (
+from adzoo.law.mmdet3d_plugin.core.bbox.util import normalize_bbox
+from adzoo.law.mmdet3d_plugin.VAD.utils.traj_lr_warmup import get_traj_warmup_loss_weight
+from adzoo.law.mmdet3d_plugin.VAD.utils.map_utils import (
     normalize_2d_pts, normalize_2d_bbox, denormalize_2d_pts, denormalize_2d_bbox
 )
 

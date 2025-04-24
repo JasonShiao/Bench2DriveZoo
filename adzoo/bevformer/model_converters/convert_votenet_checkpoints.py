@@ -5,7 +5,7 @@ import torch
 from mmcv import Config
 from mmcv.runner import load_state_dict
 
-from mmdet3d.models import build_detector
+from mmcv.models import build_detector
 
 
 def parse_args():

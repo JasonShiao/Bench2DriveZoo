@@ -24,7 +24,7 @@ from mmcv.utils import collect_env, get_root_logger
 from mmcv.utils import set_random_seed
 
 from mmcv.utils import TORCH_VERSION, digit_version
-from adzoo.bevformer.mmdet3d_plugin.bevformer.apis.train import custom_train_model
+from adzoo.vad.apis.train import custom_train_model
 
 import cv2
 cv2.setNumThreads(1)

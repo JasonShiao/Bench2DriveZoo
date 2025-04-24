@@ -3,7 +3,7 @@ import argparse
 import mmcv
 from mmcv import Config
 
-from mmdet3d.datasets import build_dataset
+from mmcv.datasets import build_dataset
 
 
 def parse_args():
