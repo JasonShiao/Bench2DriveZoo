@@ -29,7 +29,6 @@ from torchvision.transforms.functional import rotate
 import pycocotools.mask as mask_util
 # from projects.mmdet3d_plugin.models.utils.visual import save_tensor
 from torchvision.transforms.functional import rotate
-import cv2
 import argparse
 import json
 import os

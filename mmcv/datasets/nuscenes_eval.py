@@ -3,21 +3,21 @@ import copy
 import json
 import os
 import time
-import cv2
 import argparse
 import random
 import tqdm
-import torch
 from typing import Tuple, Dict, Any
+import torch
 from mmcv.fileio.io import dump,load
 from torchvision.transforms.functional import rotate
 import numpy as np
-from pyquaternion import Quaternion
 from nuscenes import NuScenes
 from nuscenes.eval.common.config import config_factory
 from nuscenes.eval.common.data_classes import EvalBoxes
 from nuscenes.eval.detection.data_classes import DetectionConfig
 from nuscenes.eval.detection.evaluate import NuScenesEval
+from pyquaternion import Quaternion
+
 from nuscenes.eval.detection.data_classes import DetectionBox
 from nuscenes.eval.detection.utils import category_to_detection_name
 from nuscenes.eval.tracking.data_classes import TrackingBox
