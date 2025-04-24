@@ -13,6 +13,7 @@ ckpts/
 data/bench2drive/
 data/infos
 data_carla
+data/nuscenes/
 viz/
 .Python
 build/
