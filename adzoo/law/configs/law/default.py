@@ -125,6 +125,22 @@ test_pipeline = [
                        'ego_lcf_feat', 'gt_attr_labels'])])
 ]
 
+inference_only_pipeline = [
+    dict(type='LoadMultiViewImageFromFiles', to_float32=True),
+    dict(type='LAWNormalizeMultiviewImage', **img_norm_cfg),
+    dict(type='LAWPadMultiViewImage', size_divisor=32),
+    dict(
+        type='MultiScaleFlipAug3D',
+        img_scale=(1600, 900),
+        pts_scale_ratio=1,
+        flip=False,
+        transforms=[
+            dict(type='LAWRandomScaleImageMultiViewImage', scales=[0.8]),
+            dict(type='LAWPadMultiViewImage', size_divisor=32),
+            dict(type='LAWCustomDefaultFormatBundle3D', class_names=class_names, with_label=False, with_ego=True),
+            dict(type='LAWCustomCollect3D', keys=[ 'img', 'ego_fut_cmd'])])
+]
+
 data = dict(
     samples_per_gpu=1,
     workers_per_gpu=8,
