@@ -113,7 +113,7 @@ def reduce_LiDAR_beams(pts, reduce_beams_to=32):
     return points.numpy()
 
 @PIPELINES.register_module()
-class CustomLoadPointsFromMultiSweeps:
+class LAWCustomLoadPointsFromMultiSweeps:
     """Load points from multiple sweeps.
 
     This is usually used for nuScenes dataset to utilize previous sweeps.
@@ -269,7 +269,7 @@ class CustomLoadPointsFromMultiSweeps:
 
 
 @PIPELINES.register_module()
-class CustomLoadPointsFromFile:
+class LAWCustomLoadPointsFromFile:
     """Load Points From File.
 
     Load sunrgbd and scannet points from file.

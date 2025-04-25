@@ -8,7 +8,7 @@ from mmcv.core.bbox.structures.box_3d_mode import (CameraInstance3DBoxes, DepthI
 
 
 @PIPELINES.register_module()
-class CustomObjectRangeFilter(object):
+class LAWCustomObjectRangeFilter(object):
     """Filter objects by the range, and also filter corresponding fut trajs
 
     Args:
@@ -63,7 +63,7 @@ class CustomObjectRangeFilter(object):
 
 
 @PIPELINES.register_module()
-class CustomObjectNameFilter(object):
+class LAWCustomObjectNameFilter(object):
     """Filter GT objects by their names, , and also filter corresponding fut trajs
 
     Args:
@@ -101,7 +101,7 @@ class CustomObjectNameFilter(object):
 
 
 @PIPELINES.register_module()
-class PadMultiViewImage(object):
+class LAWPadMultiViewImage(object):
     """Pad the multi-view image.
     There are two padding modes: (1) pad to a fixed size and (2) pad to the
     minimum size that is divisible by some number.
@@ -164,7 +164,7 @@ class PadMultiViewImage(object):
 
 
 @PIPELINES.register_module()
-class NormalizeMultiviewImage(object):
+class LAWNormalizeMultiviewImage(object):
     """Normalize the image.
     Added key is "img_norm_cfg".
     Args:
@@ -241,7 +241,7 @@ class NormalizeFlowImage(object):
         return repr_str
 
 @PIPELINES.register_module()
-class PhotoMetricDistortionMultiViewImage:
+class LAWPhotoMetricDistortionMultiViewImage:
     """Apply photometric distortion to image sequentially, every transformation
     is applied with a probability of 0.5. The position of random contrast is in
     second or second to last.
@@ -352,7 +352,7 @@ class PhotoMetricDistortionMultiViewImage:
 
 
 @PIPELINES.register_module()
-class CustomCollect3D(object):
+class LAWCustomCollect3D(object):
     """Collect data from the loader relevant to the specific task.
     This is usually the last stage of the data loader pipeline. Typically keys
     is set to some subset of "img", "proposals", "gt_bboxes",
@@ -441,7 +441,7 @@ class CustomCollect3D(object):
 
 
 @PIPELINES.register_module()
-class RandomScaleImageMultiViewImage(object):
+class LAWRandomScaleImageMultiViewImage(object):
     """Random scale the image
     Args:
         scales
@@ -490,7 +490,7 @@ class RandomScaleImageMultiViewImage(object):
     
 
 @PIPELINES.register_module()
-class CustomPointsRangeFilter:
+class LAWCustomPointsRangeFilter:
     """Filter points by the range.
     Args:
         point_cloud_range (list[float]): Point cloud range.

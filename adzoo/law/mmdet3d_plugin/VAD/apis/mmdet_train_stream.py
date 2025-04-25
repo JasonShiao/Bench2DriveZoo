@@ -12,7 +12,7 @@ import warnings
 import numpy as np
 import torch
 import torch.distributed as dist
-from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
+from mmengine.model.wrappers.distributed import MMDistributedDataParallel
 from mmcv.runner import (HOOKS, DistSamplerSeedHook, EpochBasedRunner,
                          Fp16OptimizerHook, OptimizerHook,
                          build_runner)
@@ -89,11 +89,14 @@ def custom_train_detector(model,
                 broadcast_buffers=False,
                 find_unused_parameters=find_unused_parameters)
     else:
-        model = MMDataParallel(
-            model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+        model = model.cuda(cfg.gpu_ids[0])
         if eval_model is not None:
-            eval_model = MMDataParallel(
-                eval_model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+            eval_model = eval_model.cuda(cfg.gpu_ids[0])
+        # model = MMDataParallel(
+        #     model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+        # if eval_model is not None:
+        #     eval_model = MMDataParallel(
+        #         eval_model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
 
 
     # build runner

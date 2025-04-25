@@ -80,21 +80,21 @@ model = dict(
         ),
     )
 
-dataset_type = 'VADCustomNuScenesDataset'
+dataset_type = 'VADCustomNuScenesDatasetModified'
 data_root = 'data/nuscenes/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
     dict(type='LoadMultiViewImageFromFiles', to_float32=True),
-    dict(type='PhotoMetricDistortionMultiViewImage'),
+    dict(type='LAWPhotoMetricDistortionMultiViewImage'),
     dict(type='LoadAnnotations3D', with_bbox_3d=True, with_label_3d=True, with_attr_label=True),
-    dict(type='CustomObjectRangeFilter', point_cloud_range=point_cloud_range),
-    dict(type='CustomObjectNameFilter', classes=class_names),
-    dict(type='NormalizeMultiviewImage', **img_norm_cfg),
-    dict(type='RandomScaleImageMultiViewImage', scales=[0.4]),
-    dict(type='PadMultiViewImage', size_divisor=32),
-    dict(type='CustomDefaultFormatBundle3D', class_names=class_names, with_ego=True),
-    dict(type='CustomCollect3D',\
+    dict(type='LAWCustomObjectRangeFilter', point_cloud_range=point_cloud_range),
+    dict(type='LAWCustomObjectNameFilter', classes=class_names),
+    dict(type='LAWNormalizeMultiviewImage', **img_norm_cfg),
+    dict(type='LAWRandomScaleImageMultiViewImage', scales=[0.4]),
+    dict(type='LAWPadMultiViewImage', size_divisor=32),
+    dict(type='LAWCustomDefaultFormatBundle3D', class_names=class_names, with_ego=True),
+    dict(type='LAWCustomCollect3D',\
          keys=['gt_bboxes_3d', 'gt_labels_3d', 'img', 'ego_his_trajs',
                'ego_fut_trajs', 'ego_fut_masks', 'ego_fut_cmd', 'ego_lcf_feat', 'gt_attr_labels'])
 ]
@@ -107,19 +107,19 @@ test_pipeline = [
          use_dim=5,
          file_client_args=file_client_args),
     dict(type='LoadAnnotations3D', with_bbox_3d=True, with_label_3d=True, with_attr_label=True),
-    dict(type='CustomObjectRangeFilter', point_cloud_range=point_cloud_range),
-    dict(type='CustomObjectNameFilter', classes=class_names),
-    dict(type='NormalizeMultiviewImage', **img_norm_cfg),
+    dict(type='LAWCustomObjectRangeFilter', point_cloud_range=point_cloud_range),
+    dict(type='LAWCustomObjectNameFilter', classes=class_names),
+    dict(type='LAWNormalizeMultiviewImage', **img_norm_cfg),
     dict(
         type='MultiScaleFlipAug3D',
         img_scale=(1600, 900),
         pts_scale_ratio=1,
         flip=False,
         transforms=[
-            dict(type='RandomScaleImageMultiViewImage', scales=[0.4]),
-            dict(type='PadMultiViewImage', size_divisor=32),
-            dict(type='CustomDefaultFormatBundle3D', class_names=class_names, with_label=False, with_ego=True),
-            dict(type='CustomCollect3D',\
+            dict(type='LAWRandomScaleImageMultiViewImage', scales=[0.4]),
+            dict(type='LAWPadMultiViewImage', size_divisor=32),
+            dict(type='LAWCustomDefaultFormatBundle3D', class_names=class_names, with_label=False, with_ego=True),
+            dict(type='LAWCustomCollect3D',\
                  keys=['points', 'gt_bboxes_3d', 'gt_labels_3d', 'img', 'fut_valid_flag',
                        'ego_his_trajs', 'ego_fut_trajs', 'ego_fut_masks', 'ego_fut_cmd',
                        'ego_lcf_feat', 'gt_attr_labels'])])

@@ -122,7 +122,9 @@ class EvalHook(Hook):
         self.initial_flag = True
 
         if test_fn is None:
-            raise 'not implement single_gpu_test test_gn'        
+            from adzoo.vad.apis.test import single_gpu_test
+            self.test_fn = single_gpu_test
+            #raise 'not implement single_gpu_test test_gn'        
         else:
             self.test_fn = test_fn
 
@@ -453,7 +455,9 @@ class DistEvalHook(EvalHook):
                  **eval_kwargs):
 
         if test_fn is None:
-            raise 'not implement multi_gpu_test test_fn'
+            from adzoo.law.mmdet3d_plugin.VAD.apis.test import custom_multi_gpu_test # to solve circlur  import
+            self.test_fn = custom_multi_gpu_test
+            #raise 'not implement multi_gpu_test test_fn'
 
         super().__init__(
             dataloader,

@@ -9,7 +9,7 @@ from mmcv.utils import force_fp32, auto_fp16
 from scipy.optimize import linear_sum_assignment
 from mmcv.models.detectors.mvx_two_stage import MVXTwoStageDetector
 
-from adzoo.law.mmdet3d_plugin import VAD
+from adzoo.law.mmdet3d_plugin import VADModified
 from adzoo.law.mmdet3d_plugin.models.utils.grid_mask import GridMask
 from adzoo.law.mmdet3d_plugin.VAD.planner.metric_stp3 import PlanningMetric
 from mmcv.models import builder
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from ipdb import set_trace
 
 @DETECTORS.register_module()
-class LAW(VAD):
+class LAW(VADModified):
     def __init__(self,
                 use_video=False,
                 use_swin=False,

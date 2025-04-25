@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch import Tensor
+from mmengine.runner.checkpoint import _load_checkpoint_with_prefix
 
 from mmcv.utils import Registry, build_from_cfg, get_logger, print_log
 

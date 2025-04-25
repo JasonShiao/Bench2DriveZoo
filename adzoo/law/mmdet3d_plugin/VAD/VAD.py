@@ -13,8 +13,8 @@ from adzoo.law.mmdet3d_plugin.VAD.planner.metric_stp3 import PlanningMetric
 
 
 @DETECTORS.register_module()
-class VAD(MVXTwoStageDetector):
-    """VAD model.
+class VADModified(MVXTwoStageDetector):
+    """VAD model. (slightly modified)
     """
     def __init__(self,
                  use_grid_mask=False,
@@ -37,7 +37,7 @@ class VAD(MVXTwoStageDetector):
                  fut_mode=6
                  ):
 
-        super(VAD,
+        super(VADModified,
               self).__init__(pts_voxel_layer, pts_voxel_encoder,
                              pts_middle_encoder, pts_fusion_layer,
                              img_backbone, pts_backbone, img_neck, pts_neck,

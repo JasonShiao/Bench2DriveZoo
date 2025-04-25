@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-CONFIG=configs/$1.py
+CONFIG=adzoo/law/configs/$1.py
 # echo $CONFIG
 GPUS=$2
 PORT=${PORT:-59230}

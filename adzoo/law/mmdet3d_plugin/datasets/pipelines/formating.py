@@ -10,7 +10,7 @@ from mmcv.datasets.pipelines import to_tensor
 from mmcv.datasets.pipelines import DefaultFormatBundle3D
 
 @PIPELINES.register_module()
-class CustomDefaultFormatBundle3D(DefaultFormatBundle3D):
+class LAWCustomDefaultFormatBundle3D(DefaultFormatBundle3D):
     """Default formatting bundle.
     It simplifies the pipeline of formatting common fields for voxels,
     including "proposals", "gt_bboxes", "gt_labels", "gt_masks" and
@@ -23,7 +23,7 @@ class CustomDefaultFormatBundle3D(DefaultFormatBundle3D):
     - gt_labels: (1)to tensor, (2)to DataContainer
     """
     def __init__(self, class_names, with_gt=True, with_label=True, with_ego=True):
-        super(CustomDefaultFormatBundle3D, self).__init__(class_names, with_gt, with_label)
+        super(LAWCustomDefaultFormatBundle3D, self).__init__(class_names, with_gt, with_label)
         self.with_ego = with_ego
 
 
@@ -36,7 +36,7 @@ class CustomDefaultFormatBundle3D(DefaultFormatBundle3D):
                 default bundle.
         """
         # Format 3D data
-        results = super(CustomDefaultFormatBundle3D, self).__call__(results)
+        results = super(LAWCustomDefaultFormatBundle3D, self).__call__(results)
 
         # semantic_img
         if 'semantic_img' in results:

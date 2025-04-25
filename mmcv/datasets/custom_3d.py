@@ -61,6 +61,10 @@ class Custom3DDataset(Dataset):
 
         self.CLASSES = self.get_classes(classes)
         self.cat2id = {name: i for i, name in enumerate(self.CLASSES)}
+        # print current working directory
+        import os
+        print(f'cwd: {os.getcwd()}')
+        print('Current working directory:', osp.abspath('.'))
         self.data_infos = self.load_annotations(self.ann_file)
 
         if pipeline is not None:

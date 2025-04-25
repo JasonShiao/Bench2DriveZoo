@@ -15,7 +15,7 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 import warnings
 from mmcv import Config, DictAction
 from mmcv.models import fuse_conv_bn
-from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
+from mmengine.model.wrappers.distributed import MMDistributedDataParallel
 from mmcv.utils import (get_dist_info, init_dist, load_checkpoint,
                          wrap_fp16_model)
 
@@ -102,7 +102,7 @@ def parse_args():
         choices=['none', 'pytorch', 'slurm', 'mpi'],
         default='none',
         help='job launcher')
-    parser.add_argument('--local_rank', type=int, default=0)
+    parser.add_argument('--local-rank', type=int, default=0)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -233,7 +233,7 @@ def main():
 
     if not distributed:
         # assert False
-        model = MMDataParallel(model, device_ids=[0])
+        #model = MMDataParallel(model, device_ids=[0])
         outputs = single_gpu_test(model, data_loader, args.show, args.show_dir)
     else:
         model = MMDistributedDataParallel(
