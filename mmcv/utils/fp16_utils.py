@@ -16,7 +16,8 @@ try:
     # and used; otherwise, auto fp16 will adopt mmcv's implementation.
     # Note that when PyTorch >= 1.6.0, we still cast tensor types to fp16
     # manually, so the behavior may not be consistent with real amp.
-    from torch.cuda.amp import autocast
+    #from torch.amp import autocast
+    pass
 except ImportError:
     pass
 
@@ -123,7 +124,7 @@ def auto_fp16(apply_to=None, out_fp32=False):
                         new_kwargs[arg_name] = arg_value
             # apply converted arguments to the decorated method
             if (digit_version(TORCH_VERSION) >= digit_version('1.6.0')):
-                with autocast(enabled=True):
+                with torch.autocast("cuda", enabled=True):
                     output = old_func(*new_args, **new_kwargs)
             else:
                 output = old_func(*new_args, **new_kwargs)
@@ -208,7 +209,7 @@ def force_fp32(apply_to=None, out_fp16=False):
                         new_kwargs[arg_name] = arg_value
             # apply converted arguments to the decorated method
             if (digit_version(TORCH_VERSION) >= digit_version('1.6.0')):
-                with autocast(enabled=False):
+                with torch.autocast("cuda", enabled=False):
                     output = old_func(*new_args, **new_kwargs)
             else:
                 output = old_func(*new_args, **new_kwargs)
