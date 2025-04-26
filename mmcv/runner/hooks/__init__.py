@@ -7,3 +7,5 @@ from .checkpoint import CheckpointHook
 from .iter_timer import IterTimerHook
 from .logger import *
 from .vad_hooks import *
+from .temp_agg_hook import *
+from .wm_loss_hook import *

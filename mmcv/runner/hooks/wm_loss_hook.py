@@ -1,11 +1,11 @@
 from mmcv.parallel import is_module_wrapper
-from mmcv.runner.hooks import HOOKS, Hook
+from mmcv.runner.hooks.hook import HOOKS, Hook
 
 @HOOKS.register_module()
-class EnableTempHookIter(Hook):
+class EnableWmLossHookIter(Hook):
 
     def __init__(self,
-                 enable_after_iter=4000,
+                 enable_after_iter=10000,
                  wm_loss_weight=0.2,
                  ):
         self.enable_after_iter = enable_after_iter

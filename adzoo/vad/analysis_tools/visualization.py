@@ -23,8 +23,7 @@ from nuscenes.eval.detection.utils import category_to_detection_name
 from nuscenes.utils.geometry_utils import view_points, box_in_image, BoxVisibility
 
 from mmcv.core.bbox.structures.nuscenes_box import CustomNuscenesBox
-from adzoo.law.mmdet3d_plugin.datasets.nuscenes_vad_dataset import VectorizedLocalMap, LiDARInstanceLines
-
+from mmcv.datasets.map_utils.struct import VectorizedLocalMap, LiDARInstanceLines
 
 cams = ['CAM_FRONT',
  'CAM_FRONT_RIGHT',
