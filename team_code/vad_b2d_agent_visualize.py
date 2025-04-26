@@ -78,7 +78,7 @@ class VadAgent(autonomous_agent.AutonomousAgent):
                 import importlib
                 if hasattr(cfg, 'plugin_dir'):
                     plugin_dir = cfg.plugin_dir
-                    plugin_dir = os.path.join("Bench2DriveZoo", plugin_dir)
+                    #plugin_dir = os.path.join("Bench2DriveZoo", plugin_dir)
                     _module_dir = os.path.dirname(plugin_dir)
                     _module_dir = _module_dir.split('/')
                     _module_path = _module_dir[0]
