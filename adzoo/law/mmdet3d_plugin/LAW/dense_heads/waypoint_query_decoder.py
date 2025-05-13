@@ -108,7 +108,7 @@ class WaypointHead(BaseModule):
         )
         
         # loss
-        self.loss_plan_reg = build_loss(dict(type='L1Loss', loss_weight=1.0))
+        self.loss_plan_reg = build_loss(dict(type='L1Loss', loss_weight=1.0)) # scale=1.0 -> no scale
         self.loss_plan_rec = nn.MSELoss()
 
         # head
@@ -224,7 +224,9 @@ class WaypointHead(BaseModule):
             bz, traj_len, _ = cur_waypoint.shape
             cur_waypoint = cur_waypoint.reshape(bz, traj_len, self.num_traj_modal, 2)
             ego_cmd = img_metas[0]['ego_fut_cmd'].to(img_feat.device)[0, 0]
-            cur_waypoint = cur_waypoint[: ,: ,ego_cmd == 1].squeeze(2)
+            print(ego_cmd)
+            print(cur_waypoint)
+            cur_waypoint = cur_waypoint[: ,: ,ego_cmd, :].squeeze(2)
 
         # world model prediction
         wm_next_latent = self.wm_prediction(spatial_view_feat, cur_waypoint)
@@ -253,6 +255,8 @@ class WaypointHead(BaseModule):
             gt_ego_future_traj_mask,
             ego_info=None,
             ):
+        # fut_traj_mask: Sometimes, not all future steps are valid (e.g., due to early collision, missing labels). 
+        #                [B, T_fut] (binary 0/1)  1 = valid, 0 = invalid.
         loss_waypoint = self.loss_plan_reg(preds_ego_future_traj, gt_ego_future_traj, gt_ego_future_traj_mask)
         return loss_waypoint
     

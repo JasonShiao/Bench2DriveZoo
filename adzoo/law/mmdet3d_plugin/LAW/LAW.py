@@ -80,7 +80,9 @@ class LAW(VADModified):
                 img_feats = img_feats.mean(dim=2, keepdim=True)
             else:
                 if self.use_swin:
+                    print(f"img.shape: {img.shape}")
                     img = img.unsqueeze(2)
+                    print(f"after img.unsqueeze(2), img.shape: {img.shape}")
                 img_feats = self.img_backbone(img)
 
             if isinstance(img_feats, dict):
@@ -95,6 +97,7 @@ class LAW(VADModified):
             img_feats = self.img_neck(img_feats)
         elif self.use_swin: #swin without fpn
             img_feats = [self.swin_img_mlp(img_feats[0].permute(0, 2, 3, 1)).permute(0, 3, 1, 2).contiguous()]
+            print(f"img_feats[0].shape: {img_feats[0].shape}")
 
         img_feats_reshaped = []
         for img_feat in img_feats:
@@ -110,13 +113,15 @@ class LAW(VADModified):
         """Extract features from images and points."""
 
         img_feats = self.extract_img_feat(img, img_metas, len_queue=len_queue)
+
         return img_feats
 
     def obtain_history_feat(self, imgs_queue, img_metas_list, is_test=False):
         """Obtain history BEV features iteratively.
         """
-        bs, len_queue, num_cams, C, H, W = imgs_queue.shape
-        imgs_queue = imgs_queue.reshape(bs*len_queue, num_cams, C, H, W)
+        #bs, len_queue, num_cams, C, H, W = imgs_queue.shape
+        #imgs_queue = imgs_queue.reshape(bs*len_queue, num_cams, C, H, W)
+        len_queue, num_cams, C, H, W = imgs_queue.shape
         img_feats_list = self.extract_feat(img=imgs_queue, len_queue=len_queue)
         losses = {}
         for i in range(len_queue):
@@ -242,8 +247,8 @@ class LAW(VADModified):
     def forward_test(
         self,
         img_metas,
-        gt_bboxes_3d,
-        gt_labels_3d,
+        gt_bboxes_3d=None,
+        gt_labels_3d=None,
         img=None,
         ego_his_trajs=None,
         ego_fut_trajs=None,
@@ -252,15 +257,24 @@ class LAW(VADModified):
         gt_attr_labels=None,
         **kwargs
     ):
+        if ego_his_trajs is not None:
+            ego_his_trajs=ego_his_trajs[0]
+        if ego_fut_trajs is not None:
+            ego_fut_trajs=ego_fut_trajs[0]
+        if ego_fut_cmd is not None:
+            ego_fut_cmd=ego_fut_cmd[0]
+        if ego_lcf_feat is not None:
+            ego_lcf_feat=ego_lcf_feat[0]
+        
         bbox_results = self.simple_test(
-            img_metas=img_metas,
-            img=img,
+            img_metas=img_metas[0],
+            img=img[0],
             gt_bboxes_3d=gt_bboxes_3d,
             gt_labels_3d=gt_labels_3d,
-            ego_his_trajs=ego_his_trajs[0],
-            ego_fut_trajs=ego_fut_trajs[0],
-            ego_fut_cmd=ego_fut_cmd[0],
-            ego_lcf_feat=ego_lcf_feat[0],
+            ego_his_trajs=ego_his_trajs,
+            ego_fut_trajs=ego_fut_trajs,
+            ego_fut_cmd=ego_fut_cmd,
+            ego_lcf_feat=ego_lcf_feat,
             gt_attr_labels=gt_attr_labels,
             **kwargs
         )
@@ -281,17 +295,31 @@ class LAW(VADModified):
         gt_attr_labels=None,
         **kwargs,
     ):
-        len_queue = img.size(1)
-        prev_img = img[:, :-1, ...]
-        prev_img_metas = copy.deepcopy(img_metas)
-        self.pts_bbox_head.prev_view_feat = None
-        if len_queue > 1:
-            _ = self.obtain_history_feat(prev_img, prev_img_metas, is_test=True)  
+        #print(f"img_metas: {img_metas}")
+        print(f"ego_fut_cmd: {ego_fut_cmd}")
+        print(f"LAW.simple_test, type(img): {type(img)}")
+        if type(img) == list:
+            print(f"len(img): {len(img)}")
+            if len(img) > 0:
+                print(f"img[0]: {img[0].shape}")
+        elif type(img) == torch.Tensor:
+            print(f"Tensor img.shape: {img.shape}")
+        len_queue = img.size(0)
+        # prev_img = img[:-1, ...]
+        # prev_img_metas = copy.deepcopy(img_metas)
+        # self.pts_bbox_head.prev_view_feat = None
+        # if len_queue > 1:
+        #     _ = self.obtain_history_feat(prev_img, prev_img_metas, is_test=True)  
 
-        cur_img = img[:, -1, ...]
-        cur_img_metas = [each[len_queue-1] for each in img_metas]
+        cur_img = img[:, ...]
+        print(f"cur_img.shape: {cur_img.shape}")
+        cur_img_metas = [img_metas[0]]
+        cur_img_metas[0]['ego_fut_cmd'] = ego_fut_cmd
+        #cur_img_metas = [each[len_queue-1] for each in img_metas]
+        print(f"cur_img_metas: {cur_img_metas}")
 
-        cur_img_feats = self.extract_feat(img=cur_img, img_metas=cur_img_metas)[0]  
+        cur_img_feats = self.extract_feat(img=cur_img, img_metas=cur_img_metas)[0]
+        print(f"cur_img_feats: {cur_img_feats}")
 
         bbox_list = [dict() for i in range(len(img_metas))]
         metric_dict = self.simple_test_pts(
@@ -326,49 +354,53 @@ class LAW(VADModified):
         gt_attr_labels=None,
     ):
         """Test function"""
-        B = ego_his_trajs.size(0)
-        ego_his_trajs_ = ego_his_trajs.reshape(B, -1)
-        ego_lcf_feat_ = ego_lcf_feat.reshape(B, -1)
-        ego_fut_cmd_ = ego_fut_cmd.reshape(B, -1)
-        ego_info = torch.cat([ego_his_trajs_, ego_lcf_feat_, ego_fut_cmd_], dim=1)
-
+        #B = ego_his_trajs.size(0)
+        #ego_his_trajs_ = ego_his_trajs.reshape(B, -1)
+        #ego_lcf_feat_ = ego_lcf_feat.reshape(B, -1)
+        #ego_fut_cmd_ = ego_fut_cmd.reshape(B, -1)
+        #ego_info = torch.cat([ego_his_trajs_, ego_lcf_feat_, ego_fut_cmd_], dim=1)
+        print(f"simple_test_pts img_feats: {img_feats}")
+        print(f"simple_test_pts img_metas: {img_metas}")
         preds_ego_future_traj, _, _ = self.pts_bbox_head(
                                         img_feats, 
                                         img_metas, 
                                     )
 
-        with torch.no_grad():
-            # pre-process
-            gt_bbox = gt_bboxes_3d[0][0]
-            gt_label = gt_labels_3d[0][0].to('cpu')
-            gt_attr_label = gt_attr_labels[0][0].to('cpu')
-            fut_valid_flag = bool(fut_valid_flag[0][0])
+        metric_dict_planner_stp3 = {}
 
-            # ego planning metric
-            assert ego_fut_trajs.shape[0] == 1, 'only support batch_size=1 for testing'
-            ego_fut_preds = preds_ego_future_traj[0]
-            ego_fut_trajs = ego_fut_trajs[0, 0]
-            ego_fut_cmd = ego_fut_cmd[0, 0, 0]
-            
-            ego_fut_preds = ego_fut_preds.cumsum(dim=-2)
-            ego_fut_trajs = ego_fut_trajs.cumsum(dim=-2)
+        if gt_attr_labels is not None:
+            with torch.no_grad():
+                # pre-process
+                gt_bbox = gt_bboxes_3d[0][0]
+                gt_label = gt_labels_3d[0][0].to('cpu')
+                gt_attr_label = gt_attr_labels[0][0].to('cpu')
+                fut_valid_flag = bool(fut_valid_flag[0][0])
 
-            metric_dict_planner_stp3 = self.compute_planner_metric_stp3(
-                pred_ego_fut_trajs = ego_fut_preds[None],
-                gt_ego_fut_trajs = ego_fut_trajs[None],
-                gt_agent_boxes = gt_bbox,
-                gt_agent_feats = gt_attr_label.unsqueeze(0),
-                fut_valid_flag = fut_valid_flag
-            )
+                # ego planning metric
+                assert ego_fut_trajs.shape[0] == 1, 'only support batch_size=1 for testing'
+                ego_fut_preds = preds_ego_future_traj[0]
+                ego_fut_trajs = ego_fut_trajs[0, 0]
+                ego_fut_cmd = ego_fut_cmd[0, 0, 0]
+                
+                ego_fut_preds = ego_fut_preds.cumsum(dim=-2)
+                ego_fut_trajs = ego_fut_trajs.cumsum(dim=-2)
 
-            #mid print
-            # update metrics
-            self.metrics_history.append(metric_dict_planner_stp3)
-            self.call_count += 1
+                metric_dict_planner_stp3 = self.compute_planner_metric_stp3(
+                    pred_ego_fut_trajs = ego_fut_preds[None],
+                    gt_ego_fut_trajs = ego_fut_trajs[None],
+                    gt_agent_boxes = gt_bbox,
+                    gt_agent_feats = gt_attr_label.unsqueeze(0),
+                    fut_valid_flag = fut_valid_flag
+                )
 
-            # print results
-            if self.call_count % 500 == 0:
-                self.compute_and_print_metrics_average()
+                #mid print
+                # update metrics
+                self.metrics_history.append(metric_dict_planner_stp3)
+                self.call_count += 1
+
+                # print results
+                if self.call_count % 500 == 0:
+                    self.compute_and_print_metrics_average()
 
         return metric_dict_planner_stp3
     

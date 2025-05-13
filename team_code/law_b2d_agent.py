@@ -392,10 +392,17 @@ class LawAgent(autonomous_agent.AutonomousAgent):
             if key != 'img_metas':
                 if torch.is_tensor(data[0]):
                     data[0] = data[0].to(self.device)
+                    print(key, data[0].shape)
+                else:
+                    print(key, type(data[0]))
         output_data_batch = self.model(input_data_batch, return_loss=False, rescale=True)
+        print('output_data_batch', output_data_batch)
         all_out_truck_d1 = output_data_batch[0]['pts_bbox']['ego_fut_preds'].cpu().numpy()
+        print('all_out_truck_d1', all_out_truck_d1)
         all_out_truck =  np.cumsum(all_out_truck_d1,axis=1)
         out_truck = all_out_truck[command]
+        print('local_command_xy', local_command_xy)
+        print('out_truck', out_truck)
         steer_traj, throttle_traj, brake_traj, metadata_traj = self.pidcontroller.control_pid(out_truck, tick_data['speed'], local_command_xy)
         if brake_traj < 0.05: brake_traj = 0.0
         if throttle_traj > brake_traj: brake_traj = 0.0

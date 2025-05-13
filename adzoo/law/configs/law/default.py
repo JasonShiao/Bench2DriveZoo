@@ -125,6 +125,7 @@ test_pipeline = [
                        'ego_lcf_feat', 'gt_attr_labels'])])
 ]
 
+# In the pipeline, the result dict is been appended with new keys inside each transform
 inference_only_pipeline = [
     dict(type='LoadMultiViewImageFromFiles', to_float32=True),
     dict(type='LAWNormalizeMultiviewImage', **img_norm_cfg),

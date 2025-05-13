@@ -75,6 +75,7 @@ class VADModified(MVXTwoStageDetector):
             if img.dim() == 5 and img.size(0) == 1:
                 img.squeeze_(0)
             elif img.dim() == 5 and img.size(0) > 1:
+                # Batch, NumImages(num camera rgbs: 6), Channels(r,g,b), Height, Width
                 B, N, C, H, W = img.size()
                 img = img.reshape(B * N, C, H, W)
             if self.use_grid_mask:
@@ -151,7 +152,7 @@ class VADModified(MVXTwoStageDetector):
         dummy_metas = None
         return self.forward_test(img=img, img_metas=[[dummy_metas]])
 
-    def forward(self, return_loss=True, **kwargs):
+    def forward(self, inputs, return_loss=True, rescale=False):
         """Calls either forward_train or forward_test depending on whether
         return_loss=True.
         Note this setting will change the expected inputs. When
@@ -162,9 +163,14 @@ class VADModified(MVXTwoStageDetector):
         augmentations.
         """
         if return_loss:
-            return self.forward_train(**kwargs)
+            losses = self.forward_train(**inputs)
+            loss, log_vars = self._parse_losses(losses)
+            outputs = dict(
+                loss=loss, log_vars=log_vars, num_samples=len(inputs['img_metas']))
+            return outputs
         else:
-            return self.forward_test(**kwargs)
+            outputs = self.forward_test(**inputs,rescale=rescale)            
+            return outputs
     
     def obtain_history_bev(self, imgs_queue, img_metas_list):
         """Obtain history BEV features iteratively. To save GPU memory, gradients are not calculated.
@@ -207,7 +213,8 @@ class VADModified(MVXTwoStageDetector):
                       ego_fut_masks=None,
                       ego_fut_cmd=None,
                       ego_lcf_feat=None,
-                      gt_attr_labels=None
+                      gt_attr_labels=None,
+                      **kwargs
                       ):
         """Forward training function.
         Args:
@@ -256,8 +263,8 @@ class VADModified(MVXTwoStageDetector):
     def forward_test(
         self,
         img_metas,
-        gt_bboxes_3d,
-        gt_labels_3d,
+        gt_bboxes_3d=None,
+        gt_labels_3d=None,
         img=None,
         ego_his_trajs=None,
         ego_fut_trajs=None,
@@ -292,16 +299,26 @@ class VADModified(MVXTwoStageDetector):
             img_metas[0][0]['can_bus'][-1] = 0
             img_metas[0][0]['can_bus'][:3] = 0
 
+
+        if ego_his_trajs is not None:
+            ego_his_trajs=ego_his_trajs[0]
+        if ego_fut_trajs is not None:
+            ego_fut_trajs=ego_fut_trajs[0]
+        if ego_fut_cmd is not None:
+            ego_fut_cmd=ego_fut_cmd[0]
+        if ego_lcf_feat is not None:
+            ego_lcf_feat=ego_lcf_feat[0]
+
         new_prev_bev, bbox_results = self.simple_test(
             img_metas=img_metas[0],
             img=img[0],
             prev_bev=self.prev_frame_info['prev_bev'],
             gt_bboxes_3d=gt_bboxes_3d,
             gt_labels_3d=gt_labels_3d,
-            ego_his_trajs=ego_his_trajs[0],
-            ego_fut_trajs=ego_fut_trajs[0],
-            ego_fut_cmd=ego_fut_cmd[0],
-            ego_lcf_feat=ego_lcf_feat[0],
+            ego_his_trajs=ego_his_trajs,
+            ego_fut_trajs=ego_fut_trajs,
+            ego_fut_cmd=ego_fut_cmd,
+            ego_lcf_feat=ego_lcf_feat,
             gt_attr_labels=gt_attr_labels,
             **kwargs
         )
@@ -391,48 +408,53 @@ class VADModified(MVXTwoStageDetector):
             bbox_result['ego_fut_cmd'] = ego_fut_cmd.cpu()
             bbox_results.append(bbox_result)
 
-        assert len(bbox_results) == 1, 'only support batch_size=1 now'
-        score_threshold = 0.6
-        with torch.no_grad():
-            c_bbox_results = copy.deepcopy(bbox_results)
+        metric_dict = None
 
-            bbox_result = c_bbox_results[0]
-            gt_bbox = gt_bboxes_3d[0][0]
-            gt_label = gt_labels_3d[0][0].to('cpu')
-            gt_attr_label = gt_attr_labels[0][0].to('cpu')
-            fut_valid_flag = bool(fut_valid_flag[0][0])
-            # filter pred bbox by score_threshold
-            mask = bbox_result['scores_3d'] > score_threshold
-            bbox_result['boxes_3d'] = bbox_result['boxes_3d'][mask]
-            bbox_result['scores_3d'] = bbox_result['scores_3d'][mask]
-            bbox_result['labels_3d'] = bbox_result['labels_3d'][mask]
-            bbox_result['trajs_3d'] = bbox_result['trajs_3d'][mask]
+        if gt_attr_labels is not None:
 
-            matched_bbox_result = self.assign_pred_to_gt_vip3d(
-                bbox_result, gt_bbox, gt_label)
 
-            metric_dict = self.compute_motion_metric_vip3d(
-                gt_bbox, gt_label, gt_attr_label, bbox_result,
-                matched_bbox_result, mapped_class_names)
+            assert len(bbox_results) == 1, 'only support batch_size=1 now'
+            score_threshold = 0.6
+            with torch.no_grad():
+                c_bbox_results = copy.deepcopy(bbox_results)
 
-            # ego planning metric
-            assert ego_fut_trajs.shape[0] == 1, 'only support batch_size=1 for testing'
-            ego_fut_preds = bbox_result['ego_fut_preds']
-            ego_fut_trajs = ego_fut_trajs[0, 0]
-            ego_fut_cmd = ego_fut_cmd[0, 0, 0]
-            ego_fut_cmd_idx = torch.nonzero(ego_fut_cmd)[0, 0]
-            ego_fut_pred = ego_fut_preds[ego_fut_cmd_idx]
-            ego_fut_pred = ego_fut_pred.cumsum(dim=-2)
-            ego_fut_trajs = ego_fut_trajs.cumsum(dim=-2)
+                bbox_result = c_bbox_results[0]
+                gt_bbox = gt_bboxes_3d[0][0]
+                gt_label = gt_labels_3d[0][0].to('cpu')
+                gt_attr_label = gt_attr_labels[0][0].to('cpu')
+                fut_valid_flag = bool(fut_valid_flag[0][0])
+                # filter pred bbox by score_threshold
+                mask = bbox_result['scores_3d'] > score_threshold
+                bbox_result['boxes_3d'] = bbox_result['boxes_3d'][mask]
+                bbox_result['scores_3d'] = bbox_result['scores_3d'][mask]
+                bbox_result['labels_3d'] = bbox_result['labels_3d'][mask]
+                bbox_result['trajs_3d'] = bbox_result['trajs_3d'][mask]
 
-            metric_dict_planner_stp3 = self.compute_planner_metric_stp3(
-                pred_ego_fut_trajs = ego_fut_pred[None],
-                gt_ego_fut_trajs = ego_fut_trajs[None],
-                gt_agent_boxes = gt_bbox,
-                gt_agent_feats = gt_attr_label.unsqueeze(0),
-                fut_valid_flag = fut_valid_flag
-            )
-            metric_dict.update(metric_dict_planner_stp3)
+                matched_bbox_result = self.assign_pred_to_gt_vip3d(
+                    bbox_result, gt_bbox, gt_label)
+
+                metric_dict = self.compute_motion_metric_vip3d(
+                    gt_bbox, gt_label, gt_attr_label, bbox_result,
+                    matched_bbox_result, mapped_class_names)
+
+                # ego planning metric
+                assert ego_fut_trajs.shape[0] == 1, 'only support batch_size=1 for testing'
+                ego_fut_preds = bbox_result['ego_fut_preds']
+                ego_fut_trajs = ego_fut_trajs[0, 0]
+                ego_fut_cmd = ego_fut_cmd[0, 0, 0]
+                ego_fut_cmd_idx = torch.nonzero(ego_fut_cmd)[0, 0]
+                ego_fut_pred = ego_fut_preds[ego_fut_cmd_idx]
+                ego_fut_pred = ego_fut_pred.cumsum(dim=-2)
+                ego_fut_trajs = ego_fut_trajs.cumsum(dim=-2)
+
+                metric_dict_planner_stp3 = self.compute_planner_metric_stp3(
+                    pred_ego_fut_trajs = ego_fut_pred[None],
+                    gt_ego_fut_trajs = ego_fut_trajs[None],
+                    gt_agent_boxes = gt_bbox,
+                    gt_agent_feats = gt_attr_label.unsqueeze(0),
+                    fut_valid_flag = fut_valid_flag
+                )
+                metric_dict.update(metric_dict_planner_stp3)
 
         return outs['bev_embed'], bbox_results, metric_dict
 

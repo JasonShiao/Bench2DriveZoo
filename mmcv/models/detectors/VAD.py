@@ -76,7 +76,7 @@ class VAD(MVXTwoStageDetector):
             #     img_meta.update(input_shape=input_shape)
 
             if img.dim() == 5 and img.size(0) == 1:
-                img.squeeze_()
+                img.squeeze_(0)
             elif img.dim() == 5 and img.size(0) > 1:
                 B, N, C, H, W = img.size()
                 img = img.reshape(B * N, C, H, W)
@@ -152,7 +152,7 @@ class VAD(MVXTwoStageDetector):
         dummy_metas = None
         return self.forward_test(img=img, img_metas=[[dummy_metas]])
 
-    def forward(self, inputs,return_loss=True,rescale=False):
+    def forward(self, inputs, return_loss=True, rescale=False):
         """Calls either forward_train or forward_test depending on whether
         return_loss=True.
         Note this setting will change the expected inputs. When
